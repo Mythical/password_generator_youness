@@ -1,19 +1,36 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:18.17.1-alpine3.18'
+        }
+    }
+
+    environment {
+        FIREBASE_DEPLOY_TOKEN = credentials('firebase-token')
+    }
+
     stages {
-        stage('Build') {
+        stage('Building') {
             steps {
-                echo 'Building the application...'
+                sh 'npm install -g firebase-tools'
+            }
+        } 
+
+        stage('Testing') {
+            steps {
+                echo 'This is testing'
             }
         }
-        stage('Test') {
+
+        stage('Staging') {
             steps {
-                echo 'Running tests...'
+                sh 'firebase deploy -P password-generator-7e76b --token "$FIREBASE_DEPLOY_TOKEN"'
             }
         }
-        stage('Deploy') {
+
+        stage('Production') {
             steps {
-                echo 'Deploying application...'
+                sh 'firebase deploy -P password-generator-7e76b --token "$FIREBASE_DEPLOY_TOKEN"'
             }
         }
     }
